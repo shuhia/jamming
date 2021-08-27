@@ -11,18 +11,21 @@ function App(props) {
         artist: "Britney Spears",
         album: "Ooops!... I Did It Again",
         id: 1,
+        uri: 1,
       },
       {
         name: "So Emotional",
         artist: "Whitney Houston",
         album: "Whitney",
         id: 2,
+        uri: 2,
       },
       {
         name: "It's Not Right But It's Okay",
         artist: "Whitney Houston",
         album: "My Love Is Your Love",
         id: 3,
+        uri: 3,
       },
     ],
   });
@@ -34,18 +37,21 @@ function App(props) {
         artist: "Britney Spears",
         album: "Ooops!... I Did It Again",
         id: 1,
+        uri: 1,
       },
       {
         name: "So Emotional",
         artist: "Whitney Houston",
         album: "Whitney",
         id: 2,
+        uri: 2,
       },
       {
         name: "It's Not Right But It's Okay",
         artist: "Whitney Houston",
         album: "My Love Is Your Love",
         id: 3,
+        uri: 3,
       },
     ],
   });
@@ -73,6 +79,11 @@ function App(props) {
     });
   }
 
+  function savePlaylist() {
+    const trackURIs = playlist.tracks.map((track) => track.uri);
+    return trackURIs;
+  }
+
   return (
     <div>
       <h1>
@@ -89,6 +100,7 @@ function App(props) {
           playlist={playlist}
           onRemove={removeTrack}
           onNameChange={updatePlaylistName}
+          onSave={savePlaylist}
         ></Playlist>
       </div>
     </div>
