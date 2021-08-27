@@ -5,9 +5,10 @@ import Track from "../Track/Track";
 function TrackList(props) {
   return (
     <div className="TrackList">
-      {props.tracks.map((track) => (
-        <Track key={track.id} track={track} onAdd={props.onAdd}></Track>
-      ))}
+      {props.tracks &&
+        props.tracks.map((track) => (
+          <Track key={track.name} track={track} onAdd={props.onAdd}></Track>
+        ))}
     </div>
   );
 }

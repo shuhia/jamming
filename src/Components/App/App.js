@@ -6,14 +6,30 @@ import Playlist from "../Playlist/Playlist";
 function App(props) {
   const [searchResults, setSearchResults] = useState({});
   const [playlist, setPlayList] = useState({
-    listName: "New Playlist",
-    listTracks: [],
+    name: "New Playlist",
+    tracks: [
+      {
+        name: "Stronger",
+        artist: "Britney Spears",
+        album: "Ooops!... I Did It Again",
+      },
+      {
+        name: "So Emotional",
+        artist: "Whitney Houston",
+        album: "Whitney",
+      },
+      {
+        name: "It's Not Right But It's Okay",
+        artist: "Whitney Houston",
+        album: "My Love Is Your Love",
+      },
+    ],
   });
 
   function addTrack(track) {
-    if (!playlist.listTracks.includes((e) => e.id === track.id)) {
+    if (!playlist.tracks.includes((e) => e.id === track.id)) {
       setPlayList((prev) => {
-        return { ...prev, listTracks: [...prev.listTracks, track] };
+        return { ...prev, tracks: [...prev.tracks, track] };
       });
     }
   }
