@@ -2,6 +2,7 @@ import "./App.css";
 import { useState } from "react";
 import SearchResults from "../SearchResults/SearchResults";
 import Playlist from "../Playlist/Playlist";
+import SearchBar from "../SearchBar/SearchBar";
 
 function App(props) {
   const [searchResults, setSearchResults] = useState({
@@ -84,13 +85,17 @@ function App(props) {
     return trackURIs;
   }
 
+  function search(term) {
+    console.log(term);
+  }
+
   return (
     <div>
       <h1>
         Ja<span className="highlight">mmm</span>ing
       </h1>
       <div className="App">
-        SearchBar
+        <SearchBar onSearch={search}></SearchBar>
         <div className="App-playlist"></div>
         <SearchResults
           searchResults={searchResults}
