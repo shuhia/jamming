@@ -10,16 +10,19 @@ function App(props) {
         name: "Stronger",
         artist: "Britney Spears",
         album: "Ooops!... I Did It Again",
+        id: 1,
       },
       {
         name: "So Emotional",
         artist: "Whitney Houston",
         album: "Whitney",
+        id: 2,
       },
       {
         name: "It's Not Right But It's Okay",
         artist: "Whitney Houston",
         album: "My Love Is Your Love",
+        id: 3,
       },
     ],
   });
@@ -30,16 +33,19 @@ function App(props) {
         name: "Stronger",
         artist: "Britney Spears",
         album: "Ooops!... I Did It Again",
+        id: 1,
       },
       {
         name: "So Emotional",
         artist: "Whitney Houston",
         album: "Whitney",
+        id: 2,
       },
       {
         name: "It's Not Right But It's Okay",
         artist: "Whitney Houston",
         album: "My Love Is Your Love",
+        id: 3,
       },
     ],
   });
@@ -50,6 +56,15 @@ function App(props) {
         return { ...prev, tracks: [...prev.tracks, track] };
       });
     }
+  }
+
+  function removeTrack(id) {
+    setPlayList((prev) => {
+      return {
+        ...prev,
+        tracks: prev.tracks.filter((track) => track.id !== id),
+      };
+    });
   }
 
   return (
@@ -64,7 +79,7 @@ function App(props) {
           searchResults={searchResults}
           onAdd={addTrack}
         ></SearchResults>
-        <Playlist playlist={playlist}></Playlist>
+        <Playlist playlist={playlist} onRemove={removeTrack}></Playlist>
       </div>
     </div>
   );
