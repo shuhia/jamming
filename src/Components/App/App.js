@@ -1,6 +1,9 @@
 import "./App.css";
+import { useState } from "react";
+import SearchResults from "../SearchResults/SearchResults";
 
-function App() {
+function App(props) {
+  const [searchResults, setSearchResults] = useState({});
   return (
     <div>
       <h1>
@@ -9,7 +12,7 @@ function App() {
       <div className="App">
         SearchBar
         <div className="App-playlist"></div>
-        SearchResults, Playlist
+        <SearchResults searchResults={searchResults}></SearchResults>, Playlist
       </div>
     </div>
   );
