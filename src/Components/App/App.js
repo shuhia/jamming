@@ -96,17 +96,18 @@ function App(props) {
       </h1>
       <div className="App">
         <SearchBar onSearch={search}></SearchBar>
-        <div className="App-playlist"></div>
-        <SearchResults
-          searchResults={searchResults}
-          onAdd={addTrack}
-        ></SearchResults>
-        <Playlist
-          playlist={playlist}
-          onRemove={removeTrack}
-          onNameChange={updatePlaylistName}
-          onSave={savePlaylist}
-        ></Playlist>
+        <div className="App-playlist">
+          <SearchResults
+            searchResults={searchResults}
+            onAdd={addTrack}
+          ></SearchResults>
+          <Playlist
+            playlist={playlist}
+            onRemove={removeTrack}
+            onNameChange={updatePlaylistName}
+            onSave={savePlaylist}
+          ></Playlist>
+        </div>
       </div>
     </div>
   );
