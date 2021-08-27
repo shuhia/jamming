@@ -4,13 +4,13 @@ import "./Track.css";
 function Track(props) {
   const { name, artist, album } = props.track;
   function renderAction() {
-    const isRemoval = props.isRemoval ? "-" : "+";
+    const isRemoval = props.isRemoval;
     return (
       <button
         className="Track-action"
         onClick={isRemoval ? removeTrack : addTrack}
       >
-        {isRemoval}
+        {isRemoval ? "-" : "+"}
       </button>
     );
   }
