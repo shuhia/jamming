@@ -67,6 +67,12 @@ function App(props) {
     });
   }
 
+  function updatePlaylistName(name) {
+    setPlayList((prev) => {
+      return { ...prev, name };
+    });
+  }
+
   return (
     <div>
       <h1>
@@ -79,7 +85,11 @@ function App(props) {
           searchResults={searchResults}
           onAdd={addTrack}
         ></SearchResults>
-        <Playlist playlist={playlist} onRemove={removeTrack}></Playlist>
+        <Playlist
+          playlist={playlist}
+          onRemove={removeTrack}
+          onNameChange={updatePlaylistName}
+        ></Playlist>
       </div>
     </div>
   );
