@@ -11,9 +11,11 @@ function Track(props) {
       </button>
     );
   }
+
   function addTrack() {
     props.onAdd(props.track);
   }
+
   return (
     <div className="Track">
       <div className="Track-information">

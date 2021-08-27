@@ -4,7 +4,25 @@ import SearchResults from "../SearchResults/SearchResults";
 import Playlist from "../Playlist/Playlist";
 
 function App(props) {
-  const [searchResults, setSearchResults] = useState({});
+  const [searchResults, setSearchResults] = useState({
+    tracks: [
+      {
+        name: "Stronger",
+        artist: "Britney Spears",
+        album: "Ooops!... I Did It Again",
+      },
+      {
+        name: "So Emotional",
+        artist: "Whitney Houston",
+        album: "Whitney",
+      },
+      {
+        name: "It's Not Right But It's Okay",
+        artist: "Whitney Houston",
+        album: "My Love Is Your Love",
+      },
+    ],
+  });
   const [playlist, setPlayList] = useState({
     name: "New Playlist",
     tracks: [
