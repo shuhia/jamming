@@ -5,7 +5,14 @@ function Track(props) {
   const { name, artist, album } = props.track;
   function renderAction() {
     const action = props.isRemoval ? "-" : "+";
-    return <button className="Track-action">{action}</button>;
+    return (
+      <button className="Track-action" onClick={addTrack}>
+        {action}
+      </button>
+    );
+  }
+  function addTrack() {
+    props.onAdd(props.track);
   }
   return (
     <div className="Track">

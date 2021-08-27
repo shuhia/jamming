@@ -9,6 +9,15 @@ function App(props) {
     listName: "New Playlist",
     listTracks: [],
   });
+
+  function addTrack(track) {
+    if (!playlist.listTracks.includes((e) => e.id === track.id)) {
+      setPlayList((prev) => {
+        return { ...prev, listTracks: [...prev.listTracks, track] };
+      });
+    }
+  }
+
   return (
     <div>
       <h1>
@@ -17,7 +26,10 @@ function App(props) {
       <div className="App">
         SearchBar
         <div className="App-playlist"></div>
-        <SearchResults searchResults={searchResults}></SearchResults>
+        <SearchResults
+          searchResults={searchResults}
+          onAdd={addTrack}
+        ></SearchResults>
         <Playlist playlist={playlist}></Playlist>
       </div>
     </div>
