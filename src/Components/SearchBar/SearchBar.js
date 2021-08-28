@@ -12,6 +12,7 @@ function SearchBar(props) {
 
   function handleReset(e) {
     props.onReset();
+    setTerm("");
   }
 
   // Restore search term after redirect
@@ -23,11 +24,8 @@ function SearchBar(props) {
     }
   }, []);
 
-  //
   useEffect(() => {
-    if (term) {
-      window.localStorage.setItem("search-term", term);
-    }
+    window.localStorage.setItem("search-term", term);
   }, [term]);
 
   return (
