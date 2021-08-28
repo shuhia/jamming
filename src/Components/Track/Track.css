@@ -1,19 +1,24 @@
 .Track {
-  display: flex;
+  display: grid;
+
   align-items: center;
+
+  flex-wrap: wrap;
   border-bottom: 1px solid rgba(256, 256, 256, 0.8);
 }
 
 .Track-action {
   cursor: pointer;
   padding: 0.5rem;
-  font-size: 1.05rem;
+  font-size: 2.05rem;
   transition: color 0.25s;
   border: 0px;
   background-color: rgba(0, 0, 0, 0);
   color: #fff;
 }
-
+.Track-container {
+  display: flex;
+}
 .Track-action:hover {
   color: rgba(265, 265, 265, 0.5);
 }
