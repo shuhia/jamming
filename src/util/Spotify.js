@@ -1,23 +1,24 @@
 let accessToken;
 let accessUrl;
-let CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-let REDIRECT_URI = "http://localhost:3000/";
 let userId;
+const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
+const REDIRECT_URI = "http://localhost:3000/";
 
 // Spotify
 
 const Spotify = {
-  getPlayLists() {
-    const user = this.getUser();
+  async getPlayLists() {
+    const user = await this.getUser();
+    const url = `https://api.spotify.com/v1/users/${user.id}/playlists`;
 
-    const playlists = fetch(
-      `https://api.spotify.com/v1/users/${user.id}/playlists`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    ).then((response) => response.json());
+    const response = fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const playlists = await response.json();
+    return playlists;
   },
 
   async savePlaylist(name, trackURIs) {
@@ -29,62 +30,69 @@ const Spotify = {
     return this.addTracksToPlayList(playlistId, trackURIs);
   },
 
-  getUser() {
+  async getUser() {
     const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
-    return fetch(`${url}/me`, {
+    const response = fetch(`${url}/me`, {
       headers,
-    }).then((res) => res.json());
+    });
+    const user = await response.json();
+    return user;
   },
 
-  addTracksToPlayList(playlistId, trackURIs) {
+  async addTracksToPlayList(playlistId, trackURIs) {
     const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
 
-    return fetch(`${url}/users/${userId}/playlists/${playlistId}/tracks`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ uris: trackURIs }),
-    }).then((res) => res.json());
+    const response = await fetch(
+      `${url}/users/${userId}/playlists/${playlistId}/tracks`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ uris: trackURIs }),
+      }
+    );
+    const result = await response.json();
+    return result;
   },
-  createPlayList(name) {
+  async createPlayList(name) {
     const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
 
-    return fetch(`${url}/users/${userId}/playlists`, {
+    const response = await fetch(`${url}/users/${userId}/playlists`, {
       method: "POST",
       headers,
       body: JSON.stringify({ name }),
-    }).then((res) => res.json());
+    });
+    const result = await response.json();
+    return result;
   },
 
-  search(term) {
+  async search(term) {
     const accessToken = Spotify.getAccessToken();
     const url = `https://api.spotify.com/v1/search?type=track&q=${term}`;
     const settings = {
       headers: { Authorization: "Bearer " + accessToken },
     };
-    return fetch(url, settings)
-      .then((response) => response.json())
-      .then((jsonData) => {
-        if (!jsonData.tracks) {
-          return [];
-        } else {
-          return jsonData.tracks.items.map((track) => {
-            return {
-              id: track.id,
-              name: track.name,
-              artist: track.artists[0].name,
-              album: track.album.name,
-              uri: track.uri,
-              previewUrl: track["preview_url"],
-            };
-          });
-        }
+    const response = await fetch(url, settings);
+    const jsonData = await response.json();
+    if (jsonData.tracks) {
+      return jsonData.tracks.items.map((track) => {
+        return {
+          id: track.id,
+          name: track.name,
+          artist: track.artists[0].name,
+          album: track.album.name,
+          uri: track.uri,
+          previewUrl: track["preview_url"],
+        };
       });
+    } else {
+      return [];
+    }
   },
   requestAuthorization() {
     accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${REDIRECT_URI}`;
