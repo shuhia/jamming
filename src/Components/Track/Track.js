@@ -2,7 +2,7 @@ import React from "react";
 import "./Track.css";
 
 function Track(props) {
-  const { name, artist, album } = props.track;
+  const { name, artist, album, previewUrl } = props.track;
   function renderAction() {
     const isRemoval = props.isRemoval;
     return (
@@ -30,6 +30,9 @@ function Track(props) {
         <p>
           {artist} | {album}
         </p>
+      </div>
+      <div class="preview">
+        {previewUrl && <audio src={previewUrl} controls></audio>}
       </div>
       {renderAction()}
     </div>
