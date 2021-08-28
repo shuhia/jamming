@@ -10,6 +10,10 @@ function SearchBar(props) {
     setTerm(e.target.value);
   }
 
+  function handleReset(e) {
+    props.onReset();
+  }
+
   // Restore search term after redirect
 
   useEffect(() => {
@@ -33,9 +37,14 @@ function SearchBar(props) {
         onChange={handleTermChange}
         value={term}
       />
-      <button className="SearchButton" onClick={search}>
-        SEARCH
-      </button>
+      <div>
+        <button className="SearchButton" onClick={search}>
+          SEARCH
+        </button>
+        <button className="resetButton" onClick={handleReset}>
+          RESET
+        </button>
+      </div>
     </div>
   );
 }

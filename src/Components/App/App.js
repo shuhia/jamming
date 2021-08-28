@@ -78,6 +78,10 @@ function App(props) {
     // Set playlistTracks to an empty array
   }
 
+  function resetSearchResults() {
+    setSearchResults([]);
+  }
+
   function searchTrack(term) {
     Spotify.search(term).then((results) => {
       const filteredResults = results.filter(
@@ -96,7 +100,10 @@ function App(props) {
         Ja<span className="highlight">mmm</span>ing
       </h1>
       <div className="App">
-        <SearchBar onSearch={searchTrack}></SearchBar>
+        <SearchBar
+          onSearch={searchTrack}
+          onReset={resetSearchResults}
+        ></SearchBar>
         <div className="App-playlist">
           <SearchResults
             searchResults={filteredSearchResults}
