@@ -11,10 +11,15 @@ import { Spotify } from "../../util/Spotify";
 function App(props) {
   const [isSaving, setIsSaving] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+
   const [playlist, setPlayList] = useState({
     name: "New Playlist",
     tracks: [],
   });
+
+  const filteredSearchResults = searchResults.filter(
+    (result) => !playlist.tracks.some((track) => track.id === result.id)
+  );
 
   useEffect(() => {
     // Restore search results
@@ -38,10 +43,6 @@ function App(props) {
       setPlayList((playlist) => {
         return { ...playlist, tracks: [track, ...playlist.tracks] };
       });
-      // Remove track from searchResults
-      setSearchResults((prev) =>
-        prev.filter((prevTrack) => prevTrack.id !== track.id)
-      );
     }
   }
   // Remove track from
@@ -98,7 +99,7 @@ function App(props) {
         <SearchBar onSearch={searchTrack}></SearchBar>
         <div className="App-playlist">
           <SearchResults
-            searchResults={searchResults}
+            searchResults={filteredSearchResults}
             onAdd={addTrack}
           ></SearchResults>
           <Playlist
