@@ -2,7 +2,7 @@ let accessToken;
 let accessUrl;
 let userId;
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = "http://localhost:3000/";
+const REDIRECT_URI = window.location.href;
 
 // Spotify
 
@@ -119,7 +119,6 @@ const Spotify = {
         accessToken = accessTokenMatch[1];
         const expiresIn = parseInt(expiresInMatch[1]);
         const expireDate = Date.now() / 1000 + expiresIn;
-
         window.localStorage.setItem("token", accessToken);
         window.localStorage.setItem("expireDate", expireDate);
       }
