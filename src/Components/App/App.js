@@ -1,60 +1,19 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchResults from "../SearchResults/SearchResults";
 import Playlist from "../Playlist/Playlist";
 import SearchBar from "../SearchBar/SearchBar";
+import { Spotify } from "../../util/Spotify";
 
 function App(props) {
-  const [searchResults, setSearchResults] = useState({
-    tracks: [
-      {
-        name: "Stronger",
-        artist: "Britney Spears",
-        album: "Ooops!... I Did It Again",
-        id: 1,
-        uri: 1,
-      },
-      {
-        name: "So Emotional",
-        artist: "Whitney Houston",
-        album: "Whitney",
-        id: 2,
-        uri: 2,
-      },
-      {
-        name: "It's Not Right But It's Okay",
-        artist: "Whitney Houston",
-        album: "My Love Is Your Love",
-        id: 3,
-        uri: 3,
-      },
-    ],
-  });
+  useEffect(() => {
+    Spotify.getAccessToken();
+    const playLists = Spotify.getPlayLists();
+  }, []);
+  const [searchResults, setSearchResults] = useState([]);
   const [playlist, setPlayList] = useState({
     name: "New Playlist",
-    tracks: [
-      {
-        name: "Stronger",
-        artist: "Britney Spears",
-        album: "Ooops!... I Did It Again",
-        id: 1,
-        uri: 1,
-      },
-      {
-        name: "So Emotional",
-        artist: "Whitney Houston",
-        album: "Whitney",
-        id: 2,
-        uri: 2,
-      },
-      {
-        name: "It's Not Right But It's Okay",
-        artist: "Whitney Houston",
-        album: "My Love Is Your Love",
-        id: 3,
-        uri: 3,
-      },
-    ],
+    tracks: [],
   });
 
   function addTrack(track) {
@@ -82,11 +41,20 @@ function App(props) {
 
   function savePlaylist() {
     const trackURIs = playlist.tracks.map((track) => track.uri);
-    return trackURIs;
+
+    // TODO UPDATE PLAYLIST
+    Spotify.savePlaylist(playlist.name, trackURIs).then(createNewPlaylist());
+  }
+
+  function createNewPlaylist() {
+    // TODOS
+    // Set playlist name to new playlist
+    setPlayList({ name: "", tracks: [] });
+    // Set playlistTracks to an empty array
   }
 
   function search(term) {
-    console.log(term);
+    Spotify.search(term).then((results) => setSearchResults(results));
   }
 
   return (
