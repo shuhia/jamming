@@ -1,15 +1,14 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SearchResults from "../SearchResults/SearchResults";
 import Playlist from "../Playlist/Playlist";
 import SearchBar from "../SearchBar/SearchBar";
 import { Spotify } from "../../util/Spotify";
 
+// TODOS
+// ADD users playlist
+
 function App(props) {
-  useEffect(() => {
-    Spotify.getAccessToken();
-    const playLists = Spotify.getPlayLists();
-  }, []);
   const [searchResults, setSearchResults] = useState([]);
   const [playlist, setPlayList] = useState({
     name: "New Playlist",
@@ -17,10 +16,14 @@ function App(props) {
   });
 
   function addTrack(track) {
-    if (!playlist.tracks.includes((e) => e.id === track.id)) {
-      setPlayList((prev) => {
-        return { ...prev, tracks: [...prev.tracks, track] };
+    if (!playlist.tracks.some((e) => e.id === track.id)) {
+      setPlayList((playlist) => {
+        return { ...playlist, tracks: [track, ...playlist.tracks] };
       });
+      // Remove track from searchResults
+      setSearchResults((prev) =>
+        prev.filter((prevTrack) => prevTrack.id !== track.id)
+      );
     }
   }
 
@@ -54,7 +57,15 @@ function App(props) {
   }
 
   function search(term) {
-    Spotify.search(term).then((results) => setSearchResults(results));
+    Spotify.search(term).then((results) => {
+      const filteredResults = results.filter(
+        (track) =>
+          !playlist.tracks.some(
+            (playListTrack) => track.id === playListTrack.id
+          )
+      );
+      setSearchResults(filteredResults);
+    });
   }
 
   return (
