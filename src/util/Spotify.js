@@ -3,6 +3,7 @@ let accessUrl;
 let CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 let REDIRECT_URI = "http://localhost:3000/";
 let userId;
+
 // Spotify
 
 const Spotify = {
@@ -85,15 +86,19 @@ const Spotify = {
         }
       });
   },
+  requestAuthorization() {
+    accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = accessUrl;
+  },
   getAccessToken() {
     const token = window.localStorage.getItem("token");
 
+    // Check if token has expired
+    const currentDate = Date.now() / 1000;
+    const expired = window.localStorage.getItem("expireDate") < currentDate;
     if (accessToken) return accessToken;
     // CHeck if token is stored in localstorage
-    else if (token !== "undefined") {
-      const expireIn = window.localStorage.getItem("expire");
-      // Check if token has expired
-
+    else if (token !== "undefined" && !expired && token) {
       return token;
     } else {
       // Check if is in url
@@ -104,20 +109,20 @@ const Spotify = {
       // Check if there is a token stored
       if (accessTokenMatch && expiresInMatch) {
         accessToken = accessTokenMatch[1];
-        const expiresIn = expiresInMatch[1]; // Milliseconds
+        const expiresIn = parseInt(expiresInMatch[1]);
+        const expireDate = Date.now() / 1000 + expiresIn;
 
         window.localStorage.setItem("token", accessToken);
-        window.localStorage.setItem("expire", expiresIn);
-        return accessToken;
+        window.localStorage.setItem("expireDate", expireDate);
       }
       // Send the user to spotify auth page
       else {
-        accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${REDIRECT_URI}`;
-
-        window.location.href = accessUrl;
+        this.requestAuthorization();
       }
     }
   },
+
+  requestAccessToken() {},
 };
 
 export { Spotify };
