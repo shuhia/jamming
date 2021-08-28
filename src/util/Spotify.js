@@ -34,7 +34,7 @@ const Spotify = {
     const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
-    const response = fetch(`${url}/me`, {
+    const response = await fetch(`${url}/me`, {
       headers,
     });
     const user = await response.json();
