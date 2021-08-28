@@ -8,7 +8,7 @@ function TrackList({ tracks = [], ...rest }) {
       {tracks &&
         tracks.map((track) => (
           <Track
-            key={track.name}
+            key={track.id}
             track={track}
             onAdd={rest.onAdd}
             onRemove={rest.onRemove}

@@ -7,7 +7,6 @@ let userId;
 
 const Spotify = {
   getPlayLists() {
-    const token = accessToken;
     const user = this.getUser();
 
     const playlists = fetch(
@@ -22,16 +21,15 @@ const Spotify = {
 
   async savePlaylist(name, trackURIs) {
     if (!name || !trackURIs.length) return;
-
-    if (!accessToken) Spotify.getAccessToken();
     const user = await this.getUser();
     userId = user.id;
     const playlist = await this.createPlayList(name);
     const playlistId = playlist.id;
-    return await this.addTracksToPlayList(playlistId, trackURIs);
+    return this.addTracksToPlayList(playlistId, trackURIs);
   },
 
   getUser() {
+    const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
     return fetch(`${url}/me`, {
@@ -40,6 +38,7 @@ const Spotify = {
   },
 
   addTracksToPlayList(playlistId, trackURIs) {
+    const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
 
@@ -50,6 +49,7 @@ const Spotify = {
     }).then((res) => res.json());
   },
   createPlayList(name) {
+    const accessToken = Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
 
@@ -76,7 +76,7 @@ const Spotify = {
             return {
               id: track.id,
               name: track.name,
-              artists: track.artists,
+              artist: track.artists[0].name,
               album: track.album.name,
               uri: track.uri,
               previewUrl: track["preview_url"],
@@ -86,23 +86,32 @@ const Spotify = {
       });
   },
   getAccessToken() {
+    const token = window.localStorage.getItem("token");
+
     if (accessToken) return accessToken;
-    else {
-      // Check if token has been obtained
+    // CHeck if token is stored in localstorage
+    else if (token !== "undefined") {
+      const expireIn = window.localStorage.getItem("expire");
+      // Check if token has expired
+
+      return token;
+    } else {
+      // Check if is in url
       const url = window.location.href;
+      // Get token and expiration
       const accessTokenMatch = url.match(/access_token=([^&]*)/);
       const expiresInMatch = url.match(/expires_in=([^&]*)/);
+      // Check if there is a token stored
       if (accessTokenMatch && expiresInMatch) {
-        console.log(accessTokenMatch);
         accessToken = accessTokenMatch[1];
-        const expiresIn = expiresInMatch[1];
-        window.setTimeout(() => {
-          accessToken = null;
-        }, expiresIn * 1000);
-        window.history.pushState("Access Token", null, "/");
+        const expiresIn = expiresInMatch[1]; // Milliseconds
 
+        window.localStorage.setItem("token", accessToken);
+        window.localStorage.setItem("expire", expiresIn);
         return accessToken;
-      } else {
+      }
+      // Send the user to spotify auth page
+      else {
         accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${REDIRECT_URI}`;
 
         window.location.href = accessUrl;
