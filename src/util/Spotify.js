@@ -72,8 +72,6 @@ const Spotify = {
   },
 
   async search(term) {
- 
-    
     const accessToken = Spotify.getAccessToken();
     const url = `https://api.spotify.com/v1/search?type=track&q=${term}`;
     const settings = {
@@ -101,13 +99,13 @@ const Spotify = {
     window.location.href = accessUrl;
   },
   getAccessToken() {
-    const token = window.localStorage.getItem("token");
-
+    const token = window.sessionStorage.getItem("token");
+    
     // Check if token has expired
     const currentDate = Date.now() / 1000;
-    const expired = window.localStorage.getItem("expireDate") < currentDate;
+    const expired = window.sessionStorage.getItem("expireDate") < currentDate;
     if (accessToken) return accessToken;
-    // CHeck if token is stored in localstorage
+    // CHeck if token is stored in session storage
     else if (token !== "undefined" && !expired && token) {
       return token;
     } else {
@@ -121,8 +119,8 @@ const Spotify = {
         accessToken = accessTokenMatch[1];
         const expiresIn = parseInt(expiresInMatch[1]);
         const expireDate = Date.now() / 1000 + expiresIn;
-        window.localStorage.setItem("token", accessToken);
-        window.localStorage.setItem("expireDate", expireDate);
+        window.sessionStorage.setItem("token", accessToken);
+        window.sessionStorage.setItem("expireDate", expireDate);
         // Remove token from path
         window.history.pushState("Access Token", null, "/"); // This clears the parameters, allowing us to grab a new access token when it expires.
       }

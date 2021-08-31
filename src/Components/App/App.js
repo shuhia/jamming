@@ -24,7 +24,7 @@ function App(props) {
 
   useEffect(() => {
     // Restore search results
-    const resultData = localStorage.getItem("searchResults");
+    const resultData = window.sessionStorage.getItem("searchResults");
     const result = JSON.parse(resultData);
     if (result) {
       setSearchResults(result);
@@ -32,9 +32,21 @@ function App(props) {
   }, []);
 
   useEffect(() => {
+    // Search if user returned from spotify auth page and has a search term
+    const searchTerm = window.sessionStorage.getItem("search-term");
+    const executeSearch = window.sessionStorage.getItem("search");
+    if (executeSearch === "true" || searchTerm) {
+      searchTerm(searchTerm);
+    }
+  }, []);
+
+  useEffect(() => {
     // Save current searchResults
     if (searchResults) {
-      localStorage.setItem("searchResults", JSON.stringify(searchResults));
+      window.sessionStorage.setItem(
+        "searchResults",
+        JSON.stringify(searchResults)
+      );
     }
   }, [searchResults]);
 
@@ -84,6 +96,7 @@ function App(props) {
   }
 
   function searchTrack(term) {
+    window.sessionStorage.setItem("search", "true");
     Spotify.search(term).then((results) => {
       const filteredResults = results.filter(
         (track) =>
@@ -93,6 +106,7 @@ function App(props) {
       );
       setSearchResults(filteredResults);
     });
+    window.sessionStorage.setItem("search", "false");
   }
 
   return (
