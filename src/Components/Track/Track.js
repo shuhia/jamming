@@ -3,13 +3,11 @@ import "./Track.css";
 
 function Track(props) {
   const { name, artist, album, previewUrl } = props.track;
+  const isRemoval = props.isRemoval;
+  const handleClick = isRemoval ? removeTrack : addTrack;
   function renderAction() {
-    const isRemoval = props.isRemoval;
     return (
-      <button
-        className="Track-action"
-        onClick={isRemoval ? removeTrack : addTrack}
-      >
+      <button className="Track-action" onClick={handleClick}>
         {isRemoval ? "-" : "+"}
       </button>
     );
@@ -25,16 +23,16 @@ function Track(props) {
 
   return (
     <>
-      <div className="Track">
+      <div className="Track" onClick={handleClick}>
         <div className="Track-information">
           <h3>{name}</h3>
           <p>
             {artist} | {album}
           </p>
         </div>
-        <div class="preview">
-          {previewUrl && <audio src={previewUrl} controls></audio>}
-        </div>
+
+        {previewUrl && <audio src={previewUrl} controls></audio>}
+
         {renderAction()}
       </div>
     </>
