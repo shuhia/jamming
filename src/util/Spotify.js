@@ -72,6 +72,8 @@ const Spotify = {
   },
 
   async search(term) {
+ 
+    
     const accessToken = Spotify.getAccessToken();
     const url = `https://api.spotify.com/v1/search?type=track&q=${term}`;
     const settings = {
@@ -121,6 +123,8 @@ const Spotify = {
         const expireDate = Date.now() / 1000 + expiresIn;
         window.localStorage.setItem("token", accessToken);
         window.localStorage.setItem("expireDate", expireDate);
+        // Remove token from path
+        window.history.pushState("Access Token", null, "/"); // This clears the parameters, allowing us to grab a new access token when it expires.
       }
       // Send the user to spotify auth page
       else {

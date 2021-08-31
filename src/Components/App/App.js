@@ -11,6 +11,7 @@ import { Spotify } from "../../util/Spotify";
 function App(props) {
   const [isSaving, setIsSaving] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [spotifyToken, setSpotifyToken] = useState(null);
 
   const [playlist, setPlayList] = useState({
     name: "New Playlist",
