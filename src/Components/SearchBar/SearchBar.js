@@ -35,14 +35,13 @@ function SearchBar(props) {
         onChange={handleTermChange}
         value={term}
       />
-      <div>
-        <button className="SearchButton" onClick={search}>
-          SEARCH
-        </button>
-        <button className="resetButton" onClick={handleReset}>
-          RESET
-        </button>
-      </div>
+
+      <button className="SearchButton" onClick={search}>
+        SEARCH
+      </button>
+      <button className="ResetButton" onClick={handleReset}>
+        RESET
+      </button>
     </div>
   );
 }
