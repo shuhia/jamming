@@ -1,10 +1,19 @@
+html {
+  --scroll-bar-BG: #010c3f;
+  --scroll-bar-FG: #6c41ec;
+}
+
 .SearchResults {
+  margin-top: 10px;
   width: 50%;
   height: 950px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-color: var(--scroll-bar-FG) var(--scroll-bar-BG);
   padding: 0.88rem;
   background-color: rgba(1, 12, 63, 0.7);
   box-shadow: 0 4px 2px 2px #000000;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar {
@@ -14,7 +23,7 @@
 
 @media only screen and (max-width: 1020px) {
   .SearchResults {
-    width: 90%;
+    width: 95%;
     margin-bottom: 2rem;
   }
 }

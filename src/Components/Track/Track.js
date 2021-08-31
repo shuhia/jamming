@@ -26,18 +26,16 @@ function Track(props) {
   return (
     <>
       <div className="Track">
-        <div className="Track-container">
-          <div className="Track-information">
-            <h3>{name}</h3>
-            <p>
-              {artist} | {album}
-            </p>
-          </div>
-          {renderAction()}
+        <div className="Track-information">
+          <h3>{name}</h3>
+          <p>
+            {artist} | {album}
+          </p>
         </div>
         <div class="preview">
           {previewUrl && <audio src={previewUrl} controls></audio>}
         </div>
+        {renderAction()}
       </div>
     </>
   );

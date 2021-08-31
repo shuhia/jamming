@@ -111,14 +111,21 @@ function App(props) {
 
   return (
     <div>
-      <h1>
-        Ja<span className="highlight">mmm</span>ing
-      </h1>
+      <header>
+        <div className="UserTitle">
+          <a href="#">
+            <h1>
+              Ja<span className="highlight">mmm</span>ing
+            </h1>
+          </a>
+          <SearchBar
+            onSearch={searchTrack}
+            onReset={resetSearchResults}
+          ></SearchBar>
+        </div>
+      </header>
+
       <div className="App">
-        <SearchBar
-          onSearch={searchTrack}
-          onReset={resetSearchResults}
-        ></SearchBar>
         <div className="App-playlist">
           <SearchResults
             searchResults={filteredSearchResults}
