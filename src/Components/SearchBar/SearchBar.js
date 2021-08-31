@@ -18,14 +18,14 @@ function SearchBar(props) {
   // Restore search term after redirect
 
   useEffect(() => {
-    const term = window.localStorage.getItem("search-term");
+    const term = window.sessionStorage.getItem("search-term");
     if (term) {
       setTerm(term);
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("search-term", term);
+    window.sessionStorage.setItem("search-term", term);
   }, [term]);
 
   return (
