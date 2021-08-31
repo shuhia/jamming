@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Track.css";
 
 function Track(props) {
   const { name, artist, album, previewUrl } = props.track;
   const isRemoval = props.isRemoval;
   const handleClick = isRemoval ? removeTrack : addTrack;
+
+  useEffect(() => {
+    return () => {};
+  }, []);
+
   function renderAction() {
     return (
       <button className="Track-action" onClick={handleClick}>
@@ -23,7 +28,7 @@ function Track(props) {
 
   return (
     <>
-      <div className="Track" onClick={handleClick}>
+      <div className="Track">
         <div className="Track-information">
           <h3>{name}</h3>
           <p>
@@ -31,7 +36,9 @@ function Track(props) {
           </p>
         </div>
 
-        {previewUrl && <audio src={previewUrl} controls></audio>}
+        {previewUrl && (
+          <audio class="preview" src={previewUrl} controls></audio>
+        )}
 
         {renderAction()}
       </div>
