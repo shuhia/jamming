@@ -112,7 +112,7 @@ function App(props) {
     <div>
       <header>
         <div className="UserTitle">
-          <a href="#">
+          <a href={window.location.href}>
             <h1>
               Ja<span className="highlight">mmm</span>ing
             </h1>
