@@ -1,8 +1,9 @@
 let accessToken;
-let accessUrl;
 let userId;
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = window.location.href;
+const REDIRECT_URI =
+  process.env.REACT_APP_SPOTIFY_REDIRECT_URI ||
+  `${window.location.origin}/`;
 
 // Spotify
 
@@ -95,40 +96,38 @@ const Spotify = {
     }
   },
   requestAuthorization() {
-    accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${REDIRECT_URI}`;
+    const redirectUri = encodeURIComponent(REDIRECT_URI);
+    const accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
     window.location.href = accessUrl;
   },
   getAccessToken() {
-    const token = window.sessionStorage.getItem("token");
+    const storedToken = window.sessionStorage.getItem("token");
     
     // Check if token has expired
     const currentDate = Date.now() / 1000;
     const expired = window.sessionStorage.getItem("expireDate") < currentDate;
     if (accessToken) return accessToken;
-    // CHeck if token is stored in session storage
-    else if (token !== "undefined" && !expired && token) {
-      return token;
-    } else {
-      // Check if is in url
-      const url = window.location.href;
-      // Get token and expiration
-      const accessTokenMatch = url.match(/access_token=([^&]*)/);
-      const expiresInMatch = url.match(/expires_in=([^&]*)/);
-      // Check if there is a token stored
-      if (accessTokenMatch && expiresInMatch) {
-        accessToken = accessTokenMatch[1];
-        const expiresIn = parseInt(expiresInMatch[1]);
-        const expireDate = Date.now() / 1000 + expiresIn;
-        window.sessionStorage.setItem("token", accessToken);
-        window.sessionStorage.setItem("expireDate", expireDate);
-        // Remove token from path
-        window.history.pushState("Access Token", null, "/"); // This clears the parameters, allowing us to grab a new access token when it expires.
-      }
-      // Send the user to spotify auth page
-      else {
-        this.requestAuthorization();
-      }
+
+    if (storedToken !== "undefined" && !expired && storedToken) {
+      accessToken = storedToken;
+      return accessToken;
     }
+
+    const url = window.location.href;
+    const accessTokenMatch = url.match(/access_token=([^&]*)/);
+    const expiresInMatch = url.match(/expires_in=([^&]*)/);
+
+    if (accessTokenMatch && expiresInMatch) {
+      accessToken = accessTokenMatch[1];
+      const expiresIn = parseInt(expiresInMatch[1]);
+      const expireDate = Date.now() / 1000 + expiresIn;
+      window.sessionStorage.setItem("token", accessToken);
+      window.sessionStorage.setItem("expireDate", expireDate);
+      window.history.replaceState({}, document.title, "/");
+      return accessToken;
+    }
+
+    this.requestAuthorization();
   },
 
   requestAccessToken() {},
