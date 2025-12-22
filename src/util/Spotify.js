@@ -2,13 +2,39 @@ let accessToken;
 let userId;
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI =
-  process.env.REACT_APP_SPOTIFY_REDIRECT_URI ||
-  `${window.location.origin}/`;
+  process.env.REACT_APP_SPOTIFY_REDIRECT_URI || `${window.location.origin}/`;
+const TOKEN_URL = "https://accounts.spotify.com/api/token";
+const AUTH_URL = "https://accounts.spotify.com/authorize";
+
+function base64UrlEncode(buffer) {
+  return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+async function sha256(message) {
+  const data = new TextEncoder().encode(message);
+  const digest = await window.crypto.subtle.digest("SHA-256", data);
+  return digest;
+}
+
+async function generateCodeChallenge(codeVerifier) {
+  const hashed = await sha256(codeVerifier);
+  return base64UrlEncode(hashed);
+}
+
+function generateCodeVerifier() {
+  const array = new Uint32Array(56);
+  window.crypto.getRandomValues(array);
+  return Array.from(array, (num) => num.toString(36)).join("").slice(0, 56);
+}
 
 // Spotify
 
 const Spotify = {
   async getPlayLists() {
+    accessToken = await this.getAccessToken();
     const user = await this.getUser();
     const url = `https://api.spotify.com/v1/users/${user.id}/playlists`;
 
@@ -32,7 +58,7 @@ const Spotify = {
   },
 
   async getUser() {
-    const accessToken = Spotify.getAccessToken();
+    const accessToken = await Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
     const response = await fetch(`${url}/me`, {
@@ -43,7 +69,7 @@ const Spotify = {
   },
 
   async addTracksToPlayList(playlistId, trackURIs) {
-    const accessToken = Spotify.getAccessToken();
+    const accessToken = await Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
 
@@ -59,7 +85,7 @@ const Spotify = {
     return result;
   },
   async createPlayList(name) {
-    const accessToken = Spotify.getAccessToken();
+    const accessToken = await Spotify.getAccessToken();
     const url = "https://api.spotify.com/v1";
     const headers = { Authorization: "Bearer " + accessToken };
 
@@ -73,7 +99,7 @@ const Spotify = {
   },
 
   async search(term) {
-    const accessToken = Spotify.getAccessToken();
+    const accessToken = await Spotify.getAccessToken();
     const url = `https://api.spotify.com/v1/search?type=track&q=${term}`;
     const settings = {
       headers: { Authorization: "Bearer " + accessToken },
@@ -95,39 +121,110 @@ const Spotify = {
       return [];
     }
   },
-  requestAuthorization() {
+  async requestAuthorization() {
+    const codeVerifier =
+      window.sessionStorage.getItem("codeVerifier") || generateCodeVerifier();
+    window.sessionStorage.setItem("codeVerifier", codeVerifier);
+
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
     const redirectUri = encodeURIComponent(REDIRECT_URI);
-    const accessUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
+    const accessUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&response_type=code&scope=playlist-modify-public&redirect_uri=${redirectUri}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
     window.location.href = accessUrl;
   },
-  getAccessToken() {
-    const storedToken = window.sessionStorage.getItem("token");
-    
-    // Check if token has expired
-    const currentDate = Date.now() / 1000;
-    const expired = window.sessionStorage.getItem("expireDate") < currentDate;
+  async getAccessToken() {
     if (accessToken) return accessToken;
 
-    if (storedToken !== "undefined" && !expired && storedToken) {
+    const storedToken = window.sessionStorage.getItem("token");
+    const expireDate = window.sessionStorage.getItem("expireDate");
+    const refreshToken = window.sessionStorage.getItem("refreshToken");
+
+    const currentDate = Date.now() / 1000;
+    const expired = expireDate && expireDate < currentDate;
+
+    if (storedToken && !expired) {
       accessToken = storedToken;
       return accessToken;
     }
 
-    const url = window.location.href;
-    const accessTokenMatch = url.match(/access_token=([^&]*)/);
-    const expiresInMatch = url.match(/expires_in=([^&]*)/);
-
-    if (accessTokenMatch && expiresInMatch) {
-      accessToken = accessTokenMatch[1];
-      const expiresIn = parseInt(expiresInMatch[1]);
-      const expireDate = Date.now() / 1000 + expiresIn;
-      window.sessionStorage.setItem("token", accessToken);
-      window.sessionStorage.setItem("expireDate", expireDate);
-      window.history.replaceState({}, document.title, "/");
-      return accessToken;
+    if (expired && refreshToken) {
+      const refreshed = await this.refreshAccessToken(refreshToken);
+      if (refreshed) return refreshed;
     }
 
-    this.requestAuthorization();
+    const url = new URL(window.location.href);
+    const authorizationCode = url.searchParams.get("code");
+    const codeVerifier = window.sessionStorage.getItem("codeVerifier");
+
+    if (authorizationCode && codeVerifier) {
+      const tokenResponse = await this.exchangeCodeForToken(
+        authorizationCode,
+        codeVerifier
+      );
+      if (tokenResponse) return tokenResponse;
+    }
+
+    await this.requestAuthorization();
+  },
+
+  async exchangeCodeForToken(code, codeVerifier) {
+    const body = new URLSearchParams({
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: REDIRECT_URI,
+      client_id: CLIENT_ID,
+      code_verifier: codeVerifier,
+    });
+
+    const response = await fetch(TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body.toString(),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    accessToken = data.access_token;
+    const expireDate = Date.now() / 1000 + data.expires_in;
+    window.sessionStorage.setItem("token", accessToken);
+    window.sessionStorage.setItem("expireDate", expireDate);
+    if (data.refresh_token) {
+      window.sessionStorage.setItem("refreshToken", data.refresh_token);
+    }
+    window.history.replaceState({}, document.title, "/");
+    return accessToken;
+  },
+
+  async refreshAccessToken(refreshToken) {
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: CLIENT_ID,
+    });
+
+    const response = await fetch(TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body.toString(),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    accessToken = data.access_token;
+    const expireDate = Date.now() / 1000 + data.expires_in;
+    window.sessionStorage.setItem("token", accessToken);
+    window.sessionStorage.setItem("expireDate", expireDate);
+    window.history.replaceState({}, document.title, "/");
+    return accessToken;
   },
 
   requestAccessToken() {},
